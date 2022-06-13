@@ -1,0 +1,36 @@
+*************** void SX126xCheckDeviceReady( void )
+*** 192,198 ****
+      {
+          Sx_Board_WakeUp( );
+          // Switch is turned off when device is in sleep mode and turned on is all other modes
+-         Sx_Board_SetAntSw( RFSW_ON );
+      }
+      Sx_Board_WaitOnBusy( );
+  }
+--- 192,199 ----
+      {
+          Sx_Board_WakeUp( );
+          // Switch is turned off when device is in sleep mode and turned on is all other modes
++         //@Murata already ready for tx or sleep on Murata module.
++         //Sx_Board_SetAntSw( RFSW_ON );
+      }
+      Sx_Board_WaitOnBusy( );
+  }
+*************** void SX126xWriteCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size
+*** 863,868 ****
+  {
+      SX126xCheckDeviceReady( );
+  
+      Sx_Board_ChipSelect( 0 );
+  
+      Sx_Board_SendRecv(  ( uint8_t )command );
+--- 864,872 ----
+  {
+      SX126xCheckDeviceReady( );
+  
++   if(command == RADIO_SET_RX)//@Murta allow rx   
++     Sx_Board_SetAntSw( RFSW_RX );
++ 
+      Sx_Board_ChipSelect( 0 );
+  
+      Sx_Board_SendRecv(  ( uint8_t )command );
