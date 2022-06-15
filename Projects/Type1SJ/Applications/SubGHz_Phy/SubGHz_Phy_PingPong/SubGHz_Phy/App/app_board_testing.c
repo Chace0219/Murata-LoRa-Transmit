@@ -126,7 +126,7 @@ void app_board_test_init(void){
 
 void app_board_test_process(){
 	static uint32_t lora_send_time = 0;
-	if(HAL_GetTick() - lora_send_time >= 1000){
+	if(HAL_GetTick() - lora_send_time >= 2000){
 		lora_send_time = HAL_GetTick();
 		static uint32_t index = 0;
 		char buffer[64];

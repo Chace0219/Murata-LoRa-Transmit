@@ -181,11 +181,54 @@ void SubghzApp_Init(void)
 
   Radio.Init(&RadioEvents);
 
-#if (( USE_MODEM_LORA == 1 ) && ( USE_MODEM_FSK == 0 ))
-  Radio.SetTxConfig(MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
-	LORA_SPREADING_FACTOR, LORA_CODINGRATE,
-                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
-                    true, 0, 0, LORA_IQ_INVERSION_ON, TX_TIMEOUT_VALUE);
+  /*!
+   * \brief Sets the transmission parameters
+   *
+   * \param [IN] modem        Radio modem to be used [0: FSK, 1: LoRa]
+   * \param [IN] power        Sets the output power [dBm]
+   * \param [IN] fdev         Sets the frequency deviation (FSK only)
+   *                          FSK : [Hz]
+   *                          LoRa: 0
+   * \param [IN] bandwidth    Sets the bandwidth (LoRa only)
+   *                          FSK : 0
+   *                          LoRa: [0: 125 kHz, 1: 250 kHz,
+   *                                 2: 500 kHz, 3: Reserved]
+   * \param [IN] datarate     Sets the Datarate
+   *                          FSK : 600..300000 bits/s
+   *                          LoRa: [6: 64, 7: 128, 8: 256, 9: 512,
+   *                                10: 1024, 11: 2048, 12: 4096  chips]
+   * \param [IN] coderate     Sets the coding rate (LoRa only)
+   *                          FSK : N/A ( set to 0 )
+   *                          LoRa: [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8]
+   * \param [IN] preambleLen  Sets the preamble length
+   *                          FSK : Number of bytes
+   *                          LoRa: Length in symbols (the hardware adds 4 more symbols)
+   * \param [IN] fixLen       Fixed length packets [0: variable, 1: fixed]
+   * \param [IN] crcOn        Enables disables the CRC [0: OFF, 1: ON]
+   * \param [IN] freqHopOn    Enables disables the intra-packet frequency hopping
+   *                          FSK : N/A ( set to 0 )
+   *                          LoRa: [0: OFF, 1: ON]
+   * \param [IN] hopPeriod    Number of symbols between each hop
+   *                          FSK : N/A ( set to 0 )
+   *                          LoRa: Number of symbols
+   * \param [IN] iqInverted   Inverts IQ signals (LoRa only)
+   *                          FSK : N/A ( set to 0 )
+   *                          LoRa: [0: not inverted, 1: inverted]
+   * \param [IN] timeout      Transmission timeout [ms]
+   */
+  Radio.SetTxConfig(MODEM_LORA,
+		  	  	  	  14,
+					  0,
+					  1,
+		  	  	  	  7,
+					  1, // /* [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8] */
+					  6,
+					  false,
+					  true,
+					  0,
+					  0,
+					  false,
+					  3000);
 
   Radio.SetRxConfig(MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
                     LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
@@ -193,31 +236,10 @@ void SubghzApp_Init(void)
                     0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
 
   Radio.SetMaxPayloadLength(MODEM_LORA, BUFFER_SIZE);
-
-#elif (( USE_MODEM_LORA == 0 ) && ( USE_MODEM_FSK == 1 ))
-
-  Radio.SetTxConfig(MODEM_FSK, TX_OUTPUT_POWER, FSK_FDEV, 0,
-                    FSK_DATARATE, 0,
-                    FSK_PREAMBLE_LENGTH, FSK_FIX_LENGTH_PAYLOAD_ON,
-                    true, 0, 0, 0, TX_TIMEOUT_VALUE);
-
-  Radio.SetRxConfig(MODEM_FSK, FSK_BANDWIDTH, FSK_DATARATE,
-                    0, FSK_AFC_BANDWIDTH, FSK_PREAMBLE_LENGTH,
-                    0, FSK_FIX_LENGTH_PAYLOAD_ON, 0, true,
-                    0, 0, false, true);
-
-  Radio.SetMaxPayloadLength(MODEM_FSK, BUFFER_SIZE);
-
-#else
-#error "Please define a frequency band in the sys_conf.h file."
-#endif /* USE_MODEM_LORA | USE_MODEM_FSK */
-
   Radio.SetChannel(RF_FREQUENCY);
-
   Radio.Rx(RX_TIMEOUT_VALUE);
 
   // UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_PingPong_Process), UTIL_SEQ_RFU, PingPong_Process);
-
   /* USER CODE BEGIN SubghzApp_Init_2 */
 
   /* USER CODE END SubghzApp_Init_2 */
